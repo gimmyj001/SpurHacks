@@ -241,29 +241,65 @@ const TradeScreen: React.FC = () => {
       <View style={styles.tradeInfo}>
         <Text style={styles.tradeUser}>{item.from_username}</Text>
         <View style={styles.tradePhotosContainer}>
-          <View style={styles.photoPreviewContainer}>
-            <Image
-              source={{ uri: `http://172.20.10.2:3001/uploads/${item.from_photo_filename}` }}
-              style={styles.photoPreview}
-              resizeMode="cover"
-            />
+          <TouchableOpacity 
+            style={styles.photoPreviewContainer}
+            onPress={() => {
+              // Create a Photo object for the from photo
+              const fromPhoto: Photo = {
+                id: 0, // We don't have the actual photo ID, but we can still preview
+                filename: item.from_photo_filename,
+                original_name: item.from_photo_name,
+                description: ''
+              };
+              setPreviewPhoto(fromPhoto);
+              setShowPhotoPreview(true);
+            }}
+          >
+            <View style={styles.photoPreviewWrapper}>
+              <Image
+                source={{ uri: `http://172.20.10.2:3001/uploads/${item.from_photo_filename}` }}
+                style={styles.photoPreview}
+                resizeMode="cover"
+              />
+              <View style={styles.previewIconOverlay}>
+                <Ionicons name="eye-outline" size={12} color="white" />
+              </View>
+            </View>
             <Text style={styles.photoName} numberOfLines={1}>
               {item.from_photo_name}
             </Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.tradeArrow}>
             <Ionicons name="swap-horizontal" size={20} color="#667eea" />
           </View>
-          <View style={styles.photoPreviewContainer}>
-            <Image
-              source={{ uri: `http://172.20.10.2:3001/uploads/${item.to_photo_filename}` }}
-              style={styles.photoPreview}
-              resizeMode="cover"
-            />
+          <TouchableOpacity 
+            style={styles.photoPreviewContainer}
+            onPress={() => {
+              // Create a Photo object for the to photo
+              const toPhoto: Photo = {
+                id: 0, // We don't have the actual photo ID, but we can still preview
+                filename: item.to_photo_filename,
+                original_name: item.to_photo_name,
+                description: ''
+              };
+              setPreviewPhoto(toPhoto);
+              setShowPhotoPreview(true);
+            }}
+          >
+            <View style={styles.photoPreviewWrapper}>
+              <Image
+                source={{ uri: `http://172.20.10.2:3001/uploads/${item.to_photo_filename}` }}
+                style={styles.photoPreview}
+                resizeMode="cover"
+              />
+              <View style={styles.previewIconOverlay}>
+                <Ionicons name="eye-outline" size={12} color="white" />
+              </View>
+            </View>
             <Text style={styles.photoName} numberOfLines={1}>
               {item.to_photo_name}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <Text style={styles.tradeDate}>
           {new Date(item.created_at).toLocaleDateString()}
@@ -838,6 +874,10 @@ const styles = StyleSheet.create({
   photoPreviewContainer: {
     alignItems: 'center',
     marginHorizontal: 5,
+    position: 'relative',
+  },
+  photoPreviewWrapper: {
+    position: 'relative',
   },
   photoPreview: {
     width: 60,
@@ -1122,6 +1162,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   selectedIndicator: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 10,
+    padding: 2,
+  },
+  previewIconOverlay: {
     position: 'absolute',
     top: 5,
     right: 5,
