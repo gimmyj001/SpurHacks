@@ -278,9 +278,6 @@ const GalleryScreen: React.FC = () => {
     socketRef.current.on('trade_accepted', (data) => {
       console.log('Trade accepted:', data);
       fetchPhotos();
-      Alert.alert('Gallery Updated', 'Your gallery has been updated with traded photos!', [
-        { text: 'OK', style: 'default' }
-      ]);
     });
 
     socketRef.current.on('trade_declined', (data) => {

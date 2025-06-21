@@ -433,37 +433,61 @@ app.put('/api/trades/:tradeId/accept', authenticateToken, (req, res) => {
           db.get('SELECT * FROM photos WHERE id = ?', [trade.to_photo_id], (err2, toPhoto) => {
             if (err2 || !toPhoto) return res.status(500).json({ error: 'Database error (to photo)' });
 
-            // Insert a copy of toPhoto for from_user
-            db.run(
-              'INSERT INTO photos (user_id, filename, original_name, description, watermarked_filename) VALUES (?, ?, ?, ?, ?)',
-              [trade.from_user_id, toPhoto.filename, toPhoto.original_name, toPhoto.description, toPhoto.watermarked_filename],
-              function(err3) {
-                if (err3) return res.status(500).json({ error: 'Database error (copy toPhoto)' });
+            // Get usernames for both users
+            db.get('SELECT username FROM users WHERE id = ?', [trade.from_user_id], (err3, fromUser) => {
+              if (err3 || !fromUser) return res.status(500).json({ error: 'Database error (from user)' });
+              db.get('SELECT username FROM users WHERE id = ?', [trade.to_user_id], (err4, toUser) => {
+                if (err4 || !toUser) return res.status(500).json({ error: 'Database error (to user)' });
 
-                // Insert a copy of fromPhoto for to_user
+                // Insert a copy of toPhoto for from_user
                 db.run(
                   'INSERT INTO photos (user_id, filename, original_name, description, watermarked_filename) VALUES (?, ?, ?, ?, ?)',
-                  [trade.to_user_id, fromPhoto.filename, fromPhoto.original_name, fromPhoto.description, fromPhoto.watermarked_filename],
-                  function(err4) {
-                    if (err4) return res.status(500).json({ error: 'Database error (copy fromPhoto)' });
+                  [trade.from_user_id, toPhoto.filename, toPhoto.original_name, toPhoto.description, toPhoto.watermarked_filename],
+                  function(err5) {
+                    if (err5) return res.status(500).json({ error: 'Database error (copy toPhoto)' });
 
-                    // Notify both users
-                    io.to(`user_${trade.from_user_id}`).emit('trade_accepted', {
-                      tradeId: tradeId,
-                      fromUserId: trade.from_user_id,
-                      toUserId: trade.to_user_id
-                    });
-                    io.to(`user_${trade.to_user_id}`).emit('trade_accepted', {
-                      tradeId: tradeId,
-                      fromUserId: trade.from_user_id,
-                      toUserId: trade.to_user_id
-                    });
+                    // Insert a copy of fromPhoto for to_user
+                    db.run(
+                      'INSERT INTO photos (user_id, filename, original_name, description, watermarked_filename) VALUES (?, ?, ?, ?, ?)',
+                      [trade.to_user_id, fromPhoto.filename, fromPhoto.original_name, fromPhoto.description, fromPhoto.watermarked_filename],
+                      function(err6) {
+                        if (err6) return res.status(500).json({ error: 'Database error (copy fromPhoto)' });
 
-                    res.json({ message: 'Trade accepted' });
+                        // Notify both users
+                        io.to(`user_${trade.from_user_id}`).emit('trade_accepted', {
+                          tradeId: tradeId,
+                          fromUserId: trade.from_user_id,
+                          toUserId: trade.to_user_id,
+                          fromUsername: fromUser.username,
+                          toUsername: toUser.username,
+                          fromPhotoFilename: fromPhoto.filename,
+                          fromPhotoName: fromPhoto.original_name,
+                          fromPhotoDescription: fromPhoto.description,
+                          toPhotoFilename: toPhoto.filename,
+                          toPhotoName: toPhoto.original_name,
+                          toPhotoDescription: toPhoto.description
+                        });
+                        io.to(`user_${trade.to_user_id}`).emit('trade_accepted', {
+                          tradeId: tradeId,
+                          fromUserId: trade.from_user_id,
+                          toUserId: trade.to_user_id,
+                          fromUsername: fromUser.username,
+                          toUsername: toUser.username,
+                          fromPhotoFilename: fromPhoto.filename,
+                          fromPhotoName: fromPhoto.original_name,
+                          fromPhotoDescription: fromPhoto.description,
+                          toPhotoFilename: toPhoto.filename,
+                          toPhotoName: toPhoto.original_name,
+                          toPhotoDescription: toPhoto.description
+                        });
+
+                        res.json({ message: 'Trade accepted' });
+                      }
+                    );
                   }
                 );
-              }
-            );
+              });
+            });
           });
         });
       }

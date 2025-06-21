@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
 
@@ -46,6 +47,7 @@ interface Trade {
 
 const TradeScreen: React.FC = () => {
   const { user } = useAuth();
+  const navigation = useNavigation();
   const [users, setUsers] = useState<User[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
@@ -155,7 +157,6 @@ const TradeScreen: React.FC = () => {
         toPhotoId: selectedUserPhoto.id,
       });
 
-      Alert.alert('Success', 'Trade request sent!');
       setSelectedUser(null);
       setSelectedMyPhoto(null);
       setSelectedUserPhoto(null);
@@ -168,7 +169,6 @@ const TradeScreen: React.FC = () => {
   const handleTradeAction = async (tradeId: number, action: 'accept' | 'decline') => {
     try {
       await axios.put(`http://172.20.10.2:3001/api/trades/${tradeId}/${action}`);
-      Alert.alert('Success', `Trade ${action}ed!`);
       fetchData();
     } catch (error: any) {
       Alert.alert('Error', error.response?.data?.error || `Failed to ${action} trade`);
@@ -415,10 +415,30 @@ const TradeScreen: React.FC = () => {
     socketRef.current.on('trade_accepted', (data) => {
       console.log('Trade accepted:', data);
       fetchData();
-      // Show a brief notification that the trade was completed
-      Alert.alert('Trade Completed', 'Your photos have been successfully traded!', [
-        { text: 'OK', style: 'default' }
-      ]);
+      
+      // Navigate to trade completion screen instead of showing alert
+      const tradeData = {
+        tradeId: data.tradeId,
+        fromUsername: data.fromUsername,
+        toUsername: data.toUsername,
+        fromPhoto: {
+          filename: data.fromPhotoFilename,
+          original_name: data.fromPhotoName,
+          description: data.fromPhotoDescription || '',
+        },
+        toPhoto: {
+          filename: data.toPhotoFilename,
+          original_name: data.toPhotoName,
+          description: data.toPhotoDescription || '',
+        },
+      };
+      
+      const isFromUser = data.fromUserId === user?.id;
+      
+      (navigation as any).navigate('TradeCompletion', {
+        tradeData,
+        isFromUser,
+      });
     });
 
     socketRef.current.on('trade_declined', (data) => {

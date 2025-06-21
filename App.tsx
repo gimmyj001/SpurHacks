@@ -14,6 +14,7 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import GalleryScreen from './src/screens/GalleryScreen';
 import TradeScreen from './src/screens/TradeScreen';
+import TradeCompletionScreen from './src/screens/TradeCompletionScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 
 // Context
@@ -78,7 +79,10 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        <Stack.Screen name="Main" component={MainTabs} />
+        <>
+          <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen name="TradeCompletion" component={TradeCompletionScreen} />
+        </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />

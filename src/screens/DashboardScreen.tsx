@@ -113,10 +113,6 @@ const DashboardScreen: React.FC = () => {
     socketRef.current.on('trade_accepted', (data) => {
       console.log('Trade accepted:', data);
       fetchDashboardData();
-      // Show a brief notification that the trade was completed
-      Alert.alert('Trade Completed', 'Your photos have been successfully traded!', [
-        { text: 'OK', style: 'default' }
-      ]);
     });
 
     socketRef.current.on('trade_declined', (data) => {
