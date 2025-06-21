@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { Socket, io } from 'socket.io-client';
@@ -163,17 +164,26 @@ const GalleryScreen: React.FC = () => {
       style={styles.photoItem}
       onPress={() => setSelectedPhoto(item)}
     >
-      <Image
-        source={{ uri: `http://172.20.10.2:3001/uploads/${item.filename}` }}
-        style={styles.photoImage}
-        resizeMode="cover"
-      />
-      <View style={styles.photoOverlay}>
-        <View style={styles.securityBadge}>
-          <Ionicons name="shield-checkmark" size={12} color="white" />
-          <Text style={styles.securityText}>Protected</Text>
+      <LinearGradient
+        colors={['#667eea', '#764ba2']}
+        style={styles.gradientBorder}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.photoContainer}>
+          <Image
+            source={{ uri: `http://172.20.10.2:3001/uploads/${item.filename}` }}
+            style={styles.photoImage}
+            resizeMode="cover"
+          />
+          <View style={styles.photoOverlay}>
+            <View style={styles.securityBadge}>
+              <Ionicons name="shield-checkmark" size={12} color="white" />
+              <Text style={styles.securityText}>Protected</Text>
+            </View>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 
@@ -477,6 +487,7 @@ const styles = StyleSheet.create({
   photoImage: {
     width: '100%',
     height: (width - 30) / numColumns,
+    borderRadius: 8,
   },
   photoOverlay: {
     position: 'absolute',
@@ -578,6 +589,17 @@ const styles = StyleSheet.create({
   watermarkText: {
     color: 'rgba(255, 255, 255, 0.6)',
     fontSize: 12,
+  },
+  gradientBorder: {
+    flex: 1,
+    borderRadius: 12,
+    padding: 2,
+  },
+  photoContainer: {
+    flex: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: 'white',
   },
 });
 
