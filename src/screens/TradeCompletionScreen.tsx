@@ -85,59 +85,67 @@ const TradeCompletionScreen: React.FC<TradeCompletionScreenProps> = ({ route }) 
 
           {/* Photos Display */}
           <View style={styles.photosContainer}>
-            {/* You Gave */}
-            <View style={styles.photoSection}>
-              <View style={styles.photoSectionHeader}>
-                <Ionicons name="arrow-up" size={20} color="#ff4757" />
-                <Text style={styles.photoSectionTitle}>You Gave</Text>
+            <Text style={styles.photosTitle}>Trade Summary</Text>
+            <View style={styles.photosRow}>
+              {/* You Gave */}
+              <View style={styles.photoSection}>
+                <View style={styles.photoSectionHeader}>
+                  <Ionicons name="arrow-up" size={16} color="#ff4757" />
+                  <Text style={styles.photoSectionTitle}>You Gave</Text>
+                </View>
+                <View style={styles.photoCard}>
+                  <LinearGradient
+                    colors={['#ff4757', '#ff3742']}
+                    style={styles.photoGradientBorder}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <View style={styles.photoContainer}>
+                      <Image
+                        source={{ uri: `http://172.20.10.2:3001/uploads/${tradeData.fromPhoto.filename}` }}
+                        style={styles.photoImage}
+                        resizeMode="cover"
+                      />
+                    </View>
+                  </LinearGradient>
+                  <Text style={styles.photoName}>{tradeData.fromPhoto.original_name}</Text>
+                  {tradeData.fromPhoto.description && (
+                    <Text style={styles.photoDescription}>{tradeData.fromPhoto.description}</Text>
+                  )}
+                </View>
               </View>
-              <View style={styles.photoCard}>
-                <LinearGradient
-                  colors={['#ff4757', '#ff3742']}
-                  style={styles.photoGradientBorder}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <View style={styles.photoContainer}>
-                    <Image
-                      source={{ uri: `http://172.20.10.2:3001/uploads/${tradeData.fromPhoto.filename}` }}
-                      style={styles.photoImage}
-                      resizeMode="cover"
-                    />
-                  </View>
-                </LinearGradient>
-                <Text style={styles.photoName}>{tradeData.fromPhoto.original_name}</Text>
-                {tradeData.fromPhoto.description && (
-                  <Text style={styles.photoDescription}>{tradeData.fromPhoto.description}</Text>
-                )}
-              </View>
-            </View>
 
-            {/* You Received */}
-            <View style={styles.photoSection}>
-              <View style={styles.photoSectionHeader}>
-                <Ionicons name="arrow-down" size={20} color="#2ed573" />
-                <Text style={styles.photoSectionTitle}>You Received</Text>
+              {/* Trade Arrow */}
+              <View style={styles.tradeArrowContainer}>
+                <Ionicons name="swap-horizontal" size={32} color="white" />
               </View>
-              <View style={styles.photoCard}>
-                <LinearGradient
-                  colors={['#2ed573', '#1e90ff']}
-                  style={styles.photoGradientBorder}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <View style={styles.photoContainer}>
-                    <Image
-                      source={{ uri: `http://172.20.10.2:3001/uploads/${tradeData.toPhoto.filename}` }}
-                      style={styles.photoImage}
-                      resizeMode="cover"
-                    />
-                  </View>
-                </LinearGradient>
-                <Text style={styles.photoName}>{tradeData.toPhoto.original_name}</Text>
-                {tradeData.toPhoto.description && (
-                  <Text style={styles.photoDescription}>{tradeData.toPhoto.description}</Text>
-                )}
+
+              {/* You Received */}
+              <View style={styles.photoSection}>
+                <View style={styles.photoSectionHeader}>
+                  <Ionicons name="arrow-down" size={16} color="#2ed573" />
+                  <Text style={styles.photoSectionTitle}>You Received</Text>
+                </View>
+                <View style={styles.photoCard}>
+                  <LinearGradient
+                    colors={['#2ed573', '#1e90ff']}
+                    style={styles.photoGradientBorder}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <View style={styles.photoContainer}>
+                      <Image
+                        source={{ uri: `http://172.20.10.2:3001/uploads/${tradeData.toPhoto.filename}` }}
+                        style={styles.photoImage}
+                        resizeMode="cover"
+                      />
+                    </View>
+                  </LinearGradient>
+                  <Text style={styles.photoName}>{tradeData.toPhoto.original_name}</Text>
+                  {tradeData.toPhoto.description && (
+                    <Text style={styles.photoDescription}>{tradeData.toPhoto.description}</Text>
+                  )}
+                </View>
               </View>
             </View>
           </View>
@@ -217,8 +225,21 @@ const styles = StyleSheet.create({
   photosContainer: {
     marginBottom: 30,
   },
+  photosTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  photosRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   photoSection: {
-    marginBottom: 25,
+    flex: 1,
+    alignItems: 'center',
   },
   photoSectionHeader: {
     flexDirection: 'row',
@@ -226,10 +247,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   photoSectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: 'white',
-    marginLeft: 8,
+    marginLeft: 6,
   },
   photoCard: {
     alignItems: 'center',
@@ -245,20 +266,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   photoImage: {
-    width: width * 0.4,
-    height: width * 0.4,
+    width: width * 0.3,
+    height: width * 0.3,
   },
   photoName: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: 'white',
     textAlign: 'center',
     marginBottom: 5,
   },
   photoDescription: {
-    fontSize: 12,
+    fontSize: 10,
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
+  },
+  tradeArrowContainer: {
+    marginHorizontal: 15,
+    alignItems: 'center',
   },
   actionButtons: {
     gap: 15,
