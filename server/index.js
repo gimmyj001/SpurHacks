@@ -355,6 +355,50 @@ app.get('/api/users/:userId/photos', authenticateToken, (req, res) => {
   );
 });
 
+// Delete photo
+app.delete('/api/photos/:photoId', authenticateToken, (req, res) => {
+  const { photoId } = req.params;
+  
+  // First check if the photo belongs to the user and get file info
+  db.get('SELECT * FROM photos WHERE id = ? AND user_id = ?', [photoId, req.user.id], (err, photo) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (!photo) return res.status(404).json({ error: 'Photo not found or not owned by user' });
+    
+    // Check if photo is involved in any pending trades
+    db.get('SELECT COUNT(*) as count FROM trades WHERE (from_photo_id = ? OR to_photo_id = ?) AND status = ?', 
+      [photoId, photoId, 'pending'], (err, result) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      
+      if (result.count > 0) {
+        return res.status(400).json({ error: 'Cannot delete photo that is involved in a pending trade' });
+      }
+      
+      // Delete the photo from database
+      db.run('DELETE FROM photos WHERE id = ? AND user_id = ?', [photoId, req.user.id], function(err) {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (this.changes === 0) return res.status(404).json({ error: 'Photo not found' });
+        
+        // Delete the actual files from the filesystem
+        const fs = require('fs');
+        const originalFilePath = path.join('uploads', photo.filename);
+        const watermarkedFilePath = path.join('uploads', photo.watermarked_filename);
+        
+        // Delete original file if it exists
+        if (fs.existsSync(originalFilePath)) {
+          fs.unlinkSync(originalFilePath);
+        }
+        
+        // Delete watermarked file if it exists and is different from original
+        if (photo.watermarked_filename && photo.watermarked_filename !== photo.filename && fs.existsSync(watermarkedFilePath)) {
+          fs.unlinkSync(watermarkedFilePath);
+        }
+        
+        res.json({ message: 'Photo deleted successfully' });
+      });
+    });
+  });
+});
+
 // Get all users (for trading)
 app.get('/api/users', authenticateToken, (req, res) => {
   db.all(

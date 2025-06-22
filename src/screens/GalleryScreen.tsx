@@ -159,6 +159,33 @@ const GalleryScreen: React.FC = () => {
     }
   };
 
+  const deletePhoto = async (photoId: number) => {
+    try {
+      await axios.delete(`http://172.20.10.2:3001/api/photos/${photoId}`);
+      setSelectedPhoto(null);
+      fetchPhotos();
+      Alert.alert('Success', 'Photo deleted successfully!');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Failed to delete photo';
+      Alert.alert('Error', errorMessage);
+    }
+  };
+
+  const handleDeletePhoto = (photo: Photo) => {
+    Alert.alert(
+      'Delete Photo',
+      `Are you sure you want to delete "${photo.original_name}"? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deletePhoto(photo.id),
+        },
+      ]
+    );
+  };
+
   const renderPhotoItem = ({ item }: { item: Photo }) => (
     <TouchableOpacity
       style={styles.photoItem}
@@ -238,10 +265,18 @@ const GalleryScreen: React.FC = () => {
           <TouchableOpacity onPress={() => setSelectedPhoto(null)}>
             <Ionicons name="close" size={24} color="white" />
           </TouchableOpacity>
-          <View style={styles.securityBadge}>
-            <Ionicons name="shield-checkmark" size={16} color="white" />
-            <Text style={styles.securityText}>Protected View</Text>
+          <View style={styles.viewerHeaderCenter}>
+            <View style={styles.securityBadge}>
+              <Ionicons name="shield-checkmark" size={16} color="white" />
+              <Text style={styles.securityText}>Protected View</Text>
+            </View>
           </View>
+          <TouchableOpacity 
+            style={styles.deleteButton}
+            onPress={() => selectedPhoto && handleDeletePhoto(selectedPhoto)}
+          >
+            <Ionicons name="trash-outline" size={24} color="#ff4757" />
+          </TouchableOpacity>
         </View>
 
         <Image
@@ -563,6 +598,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
   },
+  viewerHeaderCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
   viewerImage: {
     flex: 1,
     margin: 20,
@@ -597,6 +636,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     backgroundColor: 'white',
+  },
+  deleteButton: {
+    padding: 10,
   },
 });
 
