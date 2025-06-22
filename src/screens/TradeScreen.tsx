@@ -763,11 +763,20 @@ const TradeScreen: React.FC = () => {
               >
                 <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
-              <Image
-                source={{ uri: `http://172.20.10.2:3001/uploads/${previewPhoto.filename}` }}
-                style={styles.photoPreviewImage}
-                resizeMode="contain"
-              />
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: `http://172.20.10.2:3001/uploads/${previewPhoto.filename}` }}
+                  style={styles.photoPreviewImage}
+                  resizeMode="contain"
+                />
+                <View style={styles.watermarkOverlay}>
+                  <View style={styles.watermarkGrid}>
+                    {Array.from({ length: 100 }, (_, i) => (
+                      <Text key={i} style={styles.watermarkText}>WATERMARK</Text>
+                    ))}
+                  </View>
+                </View>
+              </View>
             </View>
           </View>
         </Modal>
@@ -1196,6 +1205,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 10,
     padding: 2,
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+  watermarkOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  watermarkGrid: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  watermarkText: {
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 16,
+    fontWeight: 'bold',
+    margin: 10,
+    transform: [{ rotate: '-30deg' }],
   },
 });
 

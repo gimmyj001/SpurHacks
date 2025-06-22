@@ -279,11 +279,13 @@ const GalleryScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <Image
-          source={{ uri: `http://172.20.10.2:3001/uploads/${selectedPhoto?.filename}` }}
-          style={styles.viewerImage}
-          resizeMode="contain"
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: `http://172.20.10.2:3001/uploads/${selectedPhoto?.filename}` }}
+            style={styles.viewerImage}
+            resizeMode="contain"
+          />
+        </View>
 
         <View style={styles.viewerFooter}>
           <Text style={styles.photoName}>{selectedPhoto?.original_name}</Text>
@@ -622,9 +624,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
+  watermarkOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  watermarkGrid: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
   watermarkText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 16,
+    fontWeight: 'bold',
+    margin: 10,
+    transform: [{ rotate: '-30deg' }],
   },
   gradientBorder: {
     flex: 1,
@@ -639,6 +665,10 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 10,
+  },
+  imageContainer: {
+    flex: 1,
+    position: 'relative',
   },
 });
 
